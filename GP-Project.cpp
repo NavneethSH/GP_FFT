@@ -3,6 +3,7 @@
 using namespace std;
 
 typedef long long int ll;
+
 typedef unsigned long long int ull;
 typedef pair<ll, ll> PLL;
 typedef vector<string> VS;
@@ -74,32 +75,64 @@ vector<int> multiply(vector<int> const& a, vector<int> const& b) {
 		result[i] = round(fa[i].real());
 	return result;
 }
+
+vector<int> P,Q;
+
+//hamming distance for all substrings, binary strings allowed only
+// when you reverse it
+vector <int> hamming_distance(string str, string pattern) {
+
+    int n = str.size(), m = pattern.size();
+	P.resize(n);
+	Q.resize(n);
+    for (int i = 0; i < n; i++) P[i] = Q[i] = 0;
+    for (int i = 0; i < n; i++) P[i] = str[i] == '1' ? 1 : -1;
+    for (int i = 0, j = m - 1; j >= 0; i++, j--) Q[i] = pattern[j] == '1' ? 1 : -1;
+
+    vector <int> res;
+	vector <int> res2 = fft::multiply(P, Q);
+    for (int i = 0; (i + m) <= n; i++) {
+        res.push_back(m - ((res2[i + m - 1] + m) >> 1));
+    }
+    return res;
+}
+
 }
 
 void solve() {
 	int s1, s2;
-	cin >> s1 >> s2;
-	vector<int> a(s1);
-	vector<int> b(s2);
-	fo(i, 0, s1) cin >> a[i];
-	fo(i, 0, s2) cin >> b[i];
-	vector<int> res = fft::multiply(a, b);
+	//cin >> s1 >> s2;
+	//vector<int> a(s1);
+	//vector<int> b(s2);
+	//fo(i, 0, s1) cin >> a[i];
+	//fo(i, 0, s2) cin >> b[i];
+	//vector<int> res = fft::multiply(a, b);
+	string x = "0111100001001001101001101110101101000011110101111";
+	string y = "1001101001101110101101000";
+	int len = 1 << (32 - __builtin_clz(x.size() + y.size()) - (__builtin_popcount(x.size() + y.size()) == 1));
+	//cout<<len<<"\n";
+	vector<int> ham = fft::hamming_distance(x,y);
+	int sum = 0;
+	for(auto it : ham)cout<<it<<" ",sum+=it;
+	cout<<"\n";
+	cout<<sum<<"\n";
 	//for (auto it : res)cout << it << " ";
-	cout << "\n";
-	fo(i, 0, (s1 + s2) - 1) {
-		cout << res[i] << " ";
-	}
+	
+	//cout << "\n";
+	//fo(i, 0, (s1 + s2) - 1) {
+	//	cout << res[i] << " ";
+	//}
 	cout << "\n";
 }
 
 int main()
 {
 	speed_up;
-#ifndef ONLINE_JUDGE
-	freopen("input.txt", "r", stdin);
-
-	freopen("output.txt", "w", stdout);
-#endif
+// #ifndef ONLINE_JUDGE
+// 	freopen("input.txt", "r", stdin);
+// 	freopen("output.txt", "w", stdout);
+// #endif
 	solve();
 	return 0;
 }
+
