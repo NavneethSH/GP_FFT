@@ -3,7 +3,6 @@
 using namespace std;
 
 typedef long long int ll;
-
 typedef unsigned long long int ull;
 typedef pair<ll, ll> PLL;
 typedef vector<string> VS;
@@ -21,10 +20,112 @@ typedef map<ll, ll> MPLL;
 #define speed_up ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 
 namespace fft {
-using cd = complex<double>;
+
+template<typename T>
+class Complex {
+private:
+	T m_real;
+	T m_imag;
+public:
+	Complex<T>(T real = 0.0, T imag = 0.0)
+		: m_real(real), m_imag(imag) { };
+	Complex<T>(const Complex<T>& c)
+		: m_real(c.m_real), m_imag(c.m_imag) { };
+
+	Complex<T> operator -() const;
+	Complex<T>& operator +=(const Complex<T>&);
+	Complex<T>& operator -=(const Complex<T>&);
+	Complex<T>& operator *=(const Complex<T>&);
+	Complex<T>& operator /=(const Complex<T>&);
+	Complex<T> operator +(const Complex<T>&) const;
+	Complex<T> operator -(const Complex<T>&) const;
+	Complex<T> operator *(const Complex<T>&) const;
+	Complex<T> operator /(const Complex<T>&) const;
+	template<typename U>
+	friend ostream& operator <<(ostream&, const Complex<U>&);
+	T real();
+	T imag();
+};
+
+template<typename T>
+Complex<T> Complex<T>::operator -() const {
+	return Complex(-m_real, -m_imag);
+}
+
+template<typename T>
+Complex<T>& Complex<T>::operator +=(const Complex<T>& c2) {
+	m_real += c2.m_real;
+	m_imag += c2.m_imag;
+	return *this;
+}
+
+template<typename T>
+Complex<T>& Complex<T>::operator -=(const Complex<T>& c2) {
+	return *this += -c2;
+}
+
+template<typename T>
+Complex<T>& Complex<T>::operator *=(const Complex<T>& c2) {
+	T real = m_real * c2.m_real - m_imag * c2.m_imag;
+	T imag = m_real * c2.m_imag + m_imag * c2.m_real;
+	m_real = real;
+	m_imag = imag;
+	return *this;
+}
+
+template<typename T>
+Complex<T>& Complex<T>::operator /=(const Complex<T>& c2) {
+	Complex<T> nm = Complex<T>(*this) * Complex<T>(c2.m_real, -c2.m_imag);
+	T dn = c2.m_real * c2.m_real + c2.m_imag * c2.m_imag;
+	m_real = nm.m_real / dn;
+	m_imag = nm.m_imag / dn;
+	return *this;
+}
+
+template<typename T>
+Complex<T> Complex<T>::operator +(const Complex<T>& c2) const {
+	return Complex<T>(*this) += c2;
+}
+
+template<typename T>
+Complex<T> Complex<T>::operator -(const Complex<T>& c2) const {
+	return Complex<T>(*this) -= c2;
+}
+
+template<typename T>
+Complex<T> Complex<T>::operator *(const Complex<T>& c2) const {
+	return Complex<T>(*this) *= c2;
+}
+
+template<typename T>
+Complex<T> Complex<T>::operator /(const Complex<T>& c2) const {
+	return Complex<T>(*this) /= c2;
+}
+
+template<typename T>
+ostream& operator <<(ostream& os, const Complex<T>& c) {
+	os << c.m_real;
+	if (c.m_imag < 0)
+		os << c.m_imag << "i";
+	else if (c.m_imag > 0)
+		os << "+" << c.m_imag << "i";
+	return os;
+}
+
+template<typename T>
+T Complex<T>::real() {
+	return this->m_real;
+}
+template<typename T>
+T Complex<T>::imag() {
+	return this->m_imag;
+}
+
+using cd = Complex<double>;
 const double PI = acos(-1);
 
-void fft_build(vector<cd> & a, bool invert) {
+template<typename T>
+void fft_build(vector<T> & a, bool invert) {
 	int n = a.size();
 
 	for (int i = 1, j = 0; i < n; i++) {
@@ -56,10 +157,30 @@ void fft_build(vector<cd> & a, bool invert) {
 			x /= n;
 	}
 }
-vector<int> multiply(vector<int> const& a, vector<int> const& b) {
-	vector<cd> fa(a.begin(), a.end()), fb(b.begin(), b.end());
+
+template<typename ptr1, typename ptr2, class V>
+void init(ptr1 first1, ptr2 last1, ptr1 first2, ptr2 last2, V &a, V &b) {
+	while (first1 != last1) {
+		a.push_back(*first1);
+		++first1;
+	}
+	while (first2 != last2) {
+		b.push_back(*first2);
+		++first2;
+	}
+}
+
+//template<typename T>
+//template<typename T, class V>
+template<typename T, typename ptr1, typename ptr2>
+vector<T> multiply(ptr1 first1, ptr2 last1, ptr1 first2, ptr2 last2) {
+	vector<cd> fa, fb;
+	//vector<cd> fa(first1, last1), fb(first2, last2);
+	init(first1, last1, first2, last2, fa, fb);
+	//for (auto it : fb)cout << it << " ";
+	cout << "\n";
 	int n = 1;
-	while (n < a.size() + b.size())
+	while (n < fa.size() + fb.size())
 		n <<= 1;
 	fa.resize(n);
 	fb.resize(n);
@@ -70,69 +191,67 @@ vector<int> multiply(vector<int> const& a, vector<int> const& b) {
 		fa[i] *= fb[i];
 	fft_build(fa, true);
 
-	vector<int> result(n);
+	vector<T> result(n);
 	for (int i = 0; i < n; i++)
-		result[i] = round(fa[i].real());
+		result[i] = fa[i].real();   //round
 	return result;
 }
 
-vector<int> P,Q;
-
-//hamming distance for all substrings, binary strings allowed only
-// when you reverse it
+//Binary string
+//returns the location of the matches
 vector <int> hamming_distance(string str, string pattern) {
-
-    int n = str.size(), m = pattern.size();
-	P.resize(n);
-	Q.resize(n);
-    for (int i = 0; i < n; i++) P[i] = Q[i] = 0;
-    for (int i = 0; i < n; i++) P[i] = str[i] == '1' ? 1 : -1;
-    for (int i = 0, j = m - 1; j >= 0; i++, j--) Q[i] = pattern[j] == '1' ? 1 : -1;
-
-    vector <int> res;
-	vector <int> res2 = fft::multiply(P, Q);
-    for (int i = 0; (i + m) <= n; i++) {
-        res.push_back(m - ((res2[i + m - 1] + m) >> 1));
-    }
-    return res;
+	int n = str.size(), m = pattern.size();
+	vector<int> P(n);
+	vector<int> Q(n);
+	for (int i = 0; i < n; i++) P[i] = Q[i] = 0;
+	for (int i = 0; i < n; i++) P[i] = str[i] == '1' ? 1 : -1;
+	for (int i = 0, j = m - 1; j >= 0; i++, j--) Q[i] = pattern[j] == '1' ? 1 : -1;
+	vector <int> res;
+	vector <double> res2 = multiply<double>(P.begin(), P.end(), Q.begin(), Q.end());
+	for (int i = 0; (i + m) <= n; i++) {
+		if (m - (int((round(res2[i + m - 1])) + m) >> 1) == 0)
+			res.push_back(i);
+		//res.push_back(m - (int((round(res2[i + m - 1])) + m) >> 1));
+	}
+	return res;
 }
-
 }
 
 void solve() {
 	int s1, s2;
-	//cin >> s1 >> s2;
-	//vector<int> a(s1);
-	//vector<int> b(s2);
-	//fo(i, 0, s1) cin >> a[i];
-	//fo(i, 0, s2) cin >> b[i];
-	//vector<int> res = fft::multiply(a, b);
-	string x = "0111100001001001101001101110101101000011110101111";
-	string y = "1001101001101110101101000";
-	int len = 1 << (32 - __builtin_clz(x.size() + y.size()) - (__builtin_popcount(x.size() + y.size()) == 1));
-	//cout<<len<<"\n";
-	vector<int> ham = fft::hamming_distance(x,y);
-	int sum = 0;
-	for(auto it : ham)cout<<it<<" ",sum+=it;
-	cout<<"\n";
-	cout<<sum<<"\n";
+	cin >> s1 >> s2;
+	//vector<int> a, b;
+	//list<int> a, b;
+	deque<double> a, b;
+	double x;
+	fo(i, 0, s1) cin >> x, a.push_back(x);
+	fo(i, 0, s2) cin >> x, b.push_back(x);
+	vector<double> res = fft::multiply<double>(a.begin(), a.end(), b.begin(), b.begin() + 3);
+	//vector<double> res2 = fft::multiply2<double>(a, b);
 	//for (auto it : res)cout << it << " ";
-	
 	//cout << "\n";
-	//fo(i, 0, (s1 + s2) - 1) {
-	//	cout << res[i] << " ";
-	//}
+	// fo(i, 0, (s1 + s2) - 1) {
+	// 	cout << res[i] << ":" << res2[i] << " ";
+	// }
+	fo(i, 0, (s1 + s2) - 1) {
+		cout << res[i] << " ";
+	}
 	cout << "\n";
+	cout << *(b.begin() + 1) << "\n";
+	//string
+	vector<int> ham = fft::hamming_distance("10100101", "101");
+	for (auto it : ham) cout << it << " ";
+
 }
 
 int main()
 {
 	speed_up;
-// #ifndef ONLINE_JUDGE
-// 	freopen("input.txt", "r", stdin);
-// 	freopen("output.txt", "w", stdout);
-// #endif
+#ifndef ONLINE_JUDGE
+	freopen("input.txt", "r", stdin);
+
+	freopen("output.txt", "w", stdout);
+#endif
 	solve();
 	return 0;
 }
-
