@@ -39,7 +39,7 @@ To see if a binary string pattern exists in a binary string text - use the binar
 Example:
 
 ```
-				vector<int> ham = fft::binary_matching("10100101", "101");
+			vector<int> ham = fft::binary_matching("10100101", "101");
 
 1. ham is an integer array which will contain all positions where 101 occurs in "10100101"
 ```
