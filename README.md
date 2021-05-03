@@ -24,11 +24,16 @@ It uses the standard template library of C++ and can be utilized by including th
 
 To multiply two containers - use the multiply function of the namespace.
 Example : 
+
 `vector<double> res = fft::multiply<double>(a.begin(), a.end(), b.begin(), b.end());`
-	* a is a vector of integers.
-	* b is a deque of integers.
+
++ a is a vector of integers.
+
+* b is a deque of integers.
 
 To see if a binary string pattern exists in a binary string text - use the binary_matching function.
 Example:
+
 	`vector<int> ham = fft::binary_matching("10100101", "101");`
-	* ham is an integer array which will contain all positions where 101 occurs in "10100101"
+
+* ham is an integer array which will contain all positions where 101 occurs in "10100101"
