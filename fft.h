@@ -1,26 +1,3 @@
-#include <bits/stdc++.h>
-#include <chrono>
-
-using namespace std;
-using namespace std::chrono;
-
-typedef long long int ll;
-typedef unsigned long long int ull;
-typedef pair<ll, ll> PLL;
-typedef vector<string> VS;
-typedef vector<ll> VL;
-typedef vector<vector<ll>> VVL;
-typedef vector<int> VI;
-typedef map<ll, ll> MPLL;
-
-#define fo(i,k,n) for(ll i=k;i<n;i++)
-#define myfo(i,k,n,c) for(ll i=k;i<n;i+=c)
-#define rfo(i,n,k) for(ll i=n-1;i>=k;--i)
-#define MP make_pair
-#define PB push_back
-#define all(x) (x).begin(), (x).end()
-#define speed_up ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
-
 /*
 We have created a namespace for Fast Fourier Transform(FFT).
 We have a self defined 'Complex' class which helps us with complex numbers and operations related to it.
