@@ -26,14 +26,14 @@ typedef map<ll, ll> MPLL;
 void solve() {
 	int s1, s2;
 	cin >> s1 >> s2;
+	//vector<int> a,b;
 	vector<int> a;
-	//list<int> a, b;
 	deque<double> b;
 	double x;
 	vector<int> values(10000);
 	fo(i, 0, s1) cin >> x, a.push_back(x);
 	fo(i, 0, s2) cin >> x, b.push_back(x);
-auto f = []() -> int { return rand() % 10000; };
+	auto f = []() -> int { return rand() % 10000; };
 	generate(values.begin(), values.end(), f);
 	auto start = high_resolution_clock::now();
 	vector<double> res = fft::multiply<double>(a.begin(), a.end(), b.begin(), b.end());
@@ -53,6 +53,16 @@ auto f = []() -> int { return rand() % 10000; };
 	vector<int> ham = fft::binary_matching("10100101", "101");
 	for (auto it : ham) cout << it << " ";
 	cout<<"of the text "<<text<<"\n";
+
+	string text1 = "llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch";
+	string pat1 = "gogogoch";
+	string pat2 = "go";
+	string pat3 = "gogogosh";
+	string pat4 = "ll";
+	cout<<"The pattern "<<pat4<<" is found in locations ";
+	vector<int> ham1 = fft::string_match(text1, pat4);
+	for (auto it : ham1) cout << it << " ";
+	cout<<"of the text "<<text1<<"\n";
 }
 
 int main()

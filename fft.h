@@ -116,6 +116,14 @@ fft_build : Used to apply Fast Fourier Transform and Inverse Fourier Transform o
 It is a builtin feature(private) of the namespace which cant be accessed by the users directly.
 @params: vector a - vector on which FFT or Inverse FFT needs to be applied.
 		 bool invert: to determine if inverse FFT needs to be computed (when set to True).
+Example: Let array indices be 0,1,2,3,4,5,6,7
+i: 1 j: 4
+i: 2 j: 2
+i: 3 j: 6
+i: 4 j: 1
+i: 5 j: 5
+i: 6 j: 3
+i: 7 j: 7
 */
 template<typename T>
 void fft_build(vector<T> & a, bool invert) {
@@ -180,9 +188,9 @@ The parameters can be different types of containers
 template<typename T, typename ptr1, typename ptr2>
 vector<T> multiply(ptr1 first1, ptr1 last1, ptr2 first2, ptr2 last2) {
 	vector<cd> fa, fb;
-	//vector<cd> fa(first1, last1), fb(first2, last2);
+	
 	init(first1, last1, first2, last2, fa, fb);
-	//for (auto it : fb)cout << it << " ";
+	
 	int n = 1;
 	while (n < fa.size() + fb.size())
 		n <<= 1;
@@ -218,8 +226,27 @@ vector <int> binary_matching(string str, string pattern) {
 	for (int i = 0; (i + m) <= n; i++) {
 		if (m - (int((round(res2[i + m - 1])) + m) >> 1) == 0)
 			res.push_back(i);
-		//res.push_back(m - (int((round(res2[i + m - 1])) + m) >> 1));
+		
 	}
+	return res;
+}
+vector <int> string_match(string str, string pattern) {
+	int n = str.size(), m = pattern.size();
+	vector<cd> P(n);
+	vector<cd> Q(n);
+	
+	for (int i = 0; i < n; i++) P[i] = Complex<double>(cos(2 * PI * (str[i] - 'a') / 26), sin(2 * PI * (str[i] - 'a') / 26));
+	for (int i = 0, j = m - 1; j >= 0; i++, j--) Q[i] = Complex<double>(cos(2 * PI * (pattern[j] - 'a') / 26), -sin(2 * PI * (pattern[j] - 'a') / 26));
+	vector <int> res;
+	
+	vector <double> res2 = multiply<double>(P.begin(), P.end(), Q.begin(), Q.end());
+	for (int i = 0; (i + m) <= n; i++) {
+		
+		if (DBL_EPSILON * 1000 > abs(res2[i + m - 1] - m))
+			res.push_back(i); //cout << DBL_EPSILON << "\n";
+		
+	}
+	
 	return res;
 }
 }
