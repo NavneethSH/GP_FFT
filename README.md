@@ -45,3 +45,7 @@ Example:
 1. ham is an integer array which will contain all positions where 101 occurs in "10100101"
 ```
 
+**NOTES**
+
+* ![notes1](notes1.jpeg)
+* ![notes2](notes2.jpeg)
